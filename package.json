@@ -6,6 +6,8 @@
     "build": "tsc --build tsconfig.json"
   },
   "dependencies": {
+    "feather-icons": "^4.17.0",
+    "font-awesome": "^4.7.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0"
   },

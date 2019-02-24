@@ -9,10 +9,13 @@ import {
 
 import thunk from 'redux-thunk';
 import { AbstractReducer } from './lib/AbstractReducer';
+import { FileTree } from './lib/FileTree';
 
 
 interface State {
     action: string,
+    leftDirTree: FileTree,
+    rightDirTree: FileTree
 
 }
 
@@ -22,6 +25,8 @@ interface State {
 
 const initiateState: State = {
     action: null,
+    leftDirTree: new FileTree("/"),
+    rightDirTree: new FileTree("/")
 
 
 }

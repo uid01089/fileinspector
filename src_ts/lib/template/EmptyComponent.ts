@@ -1,5 +1,6 @@
 //import { LitElement, html } from '@polymer/lit-element';
 import { Component } from '../Component';
+import { CSS } from '../../Css';
 
 
 
@@ -19,6 +20,8 @@ class EmptyElement extends Component {
     getHTML() {
 
         return Component.html` 
+        ${CSS}
+
         <style>
         </style>
         <div></div>

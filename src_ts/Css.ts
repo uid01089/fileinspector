@@ -3,6 +3,23 @@ import { Component } from './lib/Component'
 const CSS = Component.html` 
         <style>
             
+            ul,
+            ol,
+            li,
+            body {
+                font-size: 16px;
+                font-family: Arial, Helvetica, sans-serif;
+                text-align: left;
+            }
+
+            ul {
+                padding-left: 10px;
+                
+            }
+
+            
+             
+
             .input{
                 background-color: #ccc; 
                 border: none;
