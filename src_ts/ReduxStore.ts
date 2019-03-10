@@ -11,9 +11,13 @@ import thunk from 'redux-thunk';
 import { AbstractReducer } from './lib/AbstractReducer';
 import { FileTree } from './lib/FileTree';
 
+const LEFTDIRTREE = 'leftDirTree';
+const RIGHTDIRTREE = 'rightDirTree';
+
 
 interface State {
     action: string,
+    activeWindow: string,
     leftDirTree: FileTree,
     rightDirTree: FileTree
 
@@ -25,6 +29,7 @@ interface State {
 
 const initiateState: State = {
     action: null,
+    activeWindow: LEFTDIRTREE,
     leftDirTree: new FileTree("/"),
     rightDirTree: new FileTree("/")
 
@@ -85,6 +90,6 @@ class ReduxStore {
 
 const reduxStoreInstance = new ReduxStore();
 
-export { reduxStoreInstance, ReduxStore, State };
+export { reduxStoreInstance, ReduxStore, State, LEFTDIRTREE, RIGHTDIRTREE };
 
 

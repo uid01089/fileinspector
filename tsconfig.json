@@ -5,7 +5,12 @@
         "sourceMap": true,
         "outDir": "./src",
         "strict": false,
-        "rootDir": "./src_ts"
+        "rootDir": "./src_ts",
+        "plugins": [
+            {
+                "name": "typescript-tslint-plugin"
+            }
+        ]
     },
     "exclude": [
         "node_modules",

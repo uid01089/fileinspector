@@ -1,6 +1,7 @@
 import { AbstractReducer } from '../lib/AbstractReducer.js';
 import { Action } from 'redux';
 import { State } from '../ReduxStore';
+import { FileTree } from '../lib/FileTree.js';
 
 
 const ELEMENT_CLICKED = "ELEMENT_CLICKED";
@@ -9,34 +10,39 @@ const FILE_DBLCLICKED = "FILE_DBLCLICKED";
 
 
 interface ActionElementClicked extends Action {
-    trail: string
+    trail: string,
     id: string
 }
 
 interface ActionFileDblClicked extends Action {
-    trail: string
+    trail: string,
     id: string
 }
 
 interface ActionDirDblClicked extends Action {
-    trail: string
+    trail: string,
     id: string
 }
 
+
+
 class RedFileTree extends AbstractReducer {
+
 
     constructor() {
         super();
     }
-    reducer(state: State, action: ActionElementClicked): State {
-        switch (action.type) {
+    reducer(state: State, actionIn: Action): State {
+        switch (actionIn.type) {
             case ELEMENT_CLICKED:
                 {
-                    state.action = action.type;
-                    var tree = state[action.id];
-                    tree.clicked(action.trail);
+                    var actionElementClicked = actionIn as ActionElementClicked;
+                    state.action = actionElementClicked.type;
+                    var tree = state[actionElementClicked.id] as FileTree;
+                    tree.clicked(actionElementClicked.trail);
                     return state;
                 }
+
             default: return state;
         }
     }
@@ -66,6 +72,8 @@ class RedFileTree extends AbstractReducer {
         }
         this._store.dispatch(action);
     }
+
+
 }
 
 

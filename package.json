@@ -8,10 +8,12 @@
   "dependencies": {
     "feather-icons": "^4.17.0",
     "font-awesome": "^4.7.0",
+    "mousetrap": "^1.6.2",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
-    "electron": "^4.0.0"
+    "electron": "^4.0.0",
+    "typescript-tslint-plugin": "^0.3.1"
   }
 }

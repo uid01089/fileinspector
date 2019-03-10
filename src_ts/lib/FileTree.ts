@@ -2,22 +2,41 @@ const fs = require('fs');
 const path = require('path');
 
 class FileTree {
+
     trail: string;
     rootDir: Directory;
-    currentPath: string;
     constructor(trail: string) {
         this.trail = trail;
         this.rootDir = new Directory(null, trail);
-        this.currentPath = trail;
+
 
     }
 
     getCurrentPath(): string {
-        return this.currentPath;
+        return this.getCurrentElement().getPath();
     }
 
     getRootDir(): Directory {
         return this.rootDir;
+    }
+
+    getCurrentElement(): DirElement {
+        var focusedElement = this.getFocusedElement();
+        if (typeof focusedElement === 'undefined') {
+            focusedElement = this.findElement(this.trail);
+            focusedElement.setFocus(true);
+        }
+
+        return focusedElement;
+    }
+
+    removeFocus() {
+        var allElements = this.getAllElements();
+
+        // delete focus information
+        allElements.forEach(element => {
+            element.setFocus(false);
+        });
     }
 
     /**
@@ -28,17 +47,12 @@ class FileTree {
      */
     clicked(trail: string) {
         var clickedElement = this.findElement(trail.trim());
-        var allElements = this.getAllElements();
-
-        // delete focus information
-        allElements.forEach(element => {
-            element.setFocus(false);
-        });
+        this.removeFocus();
 
         if (typeof clickedElement !== 'undefined') {
 
             clickedElement.setFocus(true);
-            this.currentPath = trail;
+
 
             if (clickedElement instanceof Directory) {
                 var clickedDirectory = clickedElement as Directory;
@@ -57,6 +71,55 @@ class FileTree {
             }
         }
 
+    }
+
+    keyPressed(keyCode: number): any {
+
+        var currentElement = this.getCurrentElement();
+        var parent = currentElement.getParent();
+
+
+        switch (keyCode) {
+            case 37: //left
+                if (currentElement instanceof Directory) {
+                    if (currentElement.isExpanded) {
+                        currentElement.unExpand();
+                    }
+                }
+
+                break;
+            case 39: //right
+                if (currentElement instanceof Directory) {
+                    if (!currentElement.isExpanded) {
+                        currentElement.expand();
+
+                        if (currentElement.isRoot) {
+                            if ((currentElement as Directory).subDirectories.length > 0) {
+                                currentElement.setFocus(false);
+                                (currentElement as Directory).subDirectories[0].setFocus(true);
+                            } else if ((currentElement as Directory).files.length > 0) {
+                                currentElement.setFocus(false);
+                                (currentElement as Directory).files[0].setFocus(true);
+                            }
+                        }
+
+
+                    }
+                }
+
+                break;
+            case 38: //up
+                if (parent != null) {
+                    parent.moveFocusUp();
+                }
+
+                break;
+
+            case 40: //down
+                if (parent != null) {
+                    parent.moveFocusDown();
+                } break;
+        }
     }
 
     /**
@@ -83,6 +146,16 @@ class FileTree {
         });
 
         return Array.from(allElements.values());
+
+    }
+
+    private getFocusedElement(): DirElement {
+        var allElements = new Map<string, DirElement>();
+        this.treeWalkder(this.rootDir, allElements, (element): boolean => {
+            return element.getFocus();
+        });
+
+        return Array.from(allElements.values())[0];
 
     }
 
@@ -115,7 +188,11 @@ class FileTree {
 
 
 }
-
+/**
+ *
+ * Base element for Directory and File
+ * @class DirElement
+ */
 class DirElement {
     protected parent: Directory;
     protected name: string;
@@ -145,6 +222,10 @@ class DirElement {
 
     setFocus(focus: boolean) {
         this.focus = focus;
+    }
+
+    getParent(): Directory {
+        return this.parent;
     }
 }
 
@@ -221,11 +302,13 @@ class Directory extends DirElement {
      */
     expand() {
         this.buildUp();
-        this.subDirectories.forEach(subContainer => {
-            //subContainer.buildUp();
-        })
 
-        this.isExpanded = true;
+
+        if ((this.subDirectories.length > 0) || this.files.length) {
+
+            this.isExpanded = true;
+        }
+
     }
 
     getSubDirectories(): Array<Directory> {
@@ -236,10 +319,146 @@ class Directory extends DirElement {
         return this.files;
     }
 
+    getFocusedElement(): DirElement {
+
+        var focusedElement: DirElement = null;
+
+        this.subDirectories.forEach(dir => {
+            if (dir.getFocus()) {
+                focusedElement = dir;
+
+            }
+        })
+
+        if (null == focusedElement) {
+            this.files.forEach(file => {
+                if (file.getFocus()) {
+                    focusedElement = file;
+
+                }
+            })
+        }
+
+        return focusedElement;
+    }
+
+    /**
+     * Moves the focus upwards. In case the focus reached the most upper element,
+     * the operation returns false, otherwise true
+     *
+     * @returns {boolean}
+     * @memberof Directory
+     */
+    moveFocusUp(): boolean {
+        var successfull = false;
+        var focusedElement = this.getFocusedElement();
+
+        var indexDir = this.subDirectories.indexOf(focusedElement as Directory);
+        var indexFile = this.files.indexOf(focusedElement as File);
+
+        if ((indexDir == 0 && this.subDirectories.length > 0 && !(focusedElement as Directory).isRoot) || //
+            ((indexFile == 0) && (this.files.length > 0) && (this.subDirectories.length == 0))) {
+            // We reached the first element
+            var parent = (focusedElement as Directory).parent;
+            focusedElement.setFocus(false);
+            parent.setFocus(true);
+            successfull = true;
+
+        } else if (indexFile > 0) {
+            // We are in the file section
+            focusedElement.setFocus(false);
+            this.files[--indexFile].setFocus(true);
+            successfull = true;
+        } else if (indexFile == 0) {
+            // We are in the middle
+            focusedElement.setFocus(false);
+            this.subDirectories[this.subDirectories.length - 1].setFocus(true);
+            successfull = true;
+        } else if (indexDir > 0) {
+            focusedElement.setFocus(false);
+            this.subDirectories[--indexDir].setFocus(true);
+            successfull = true;
+        }
+
+
+
+        return successfull;
+    }
+
+    /**
+    * Moves the focus downwards. In case the focus reached the last element,
+    * the operation returns false, otherwise true
+    *
+    * @returns {boolean}
+    * @memberof Directory
+    */
+    moveFocusDown(): boolean {
+        var successfull = false;
+        var focusedElement = this.getFocusedElement();
+        if ((focusedElement instanceof Directory) && (focusedElement as Directory).isExpanded) {
+
+            successfull = this.moveDownServiceChildDir(focusedElement as Directory);
+
+        } else {
+
+            var indexDir = this.subDirectories.indexOf(focusedElement as Directory);
+            var indexFile = this.files.indexOf(focusedElement as File);
+
+            if (indexDir > -1 && indexDir < (this.subDirectories.length - 1)) {
+                // We are in the directory section
+                focusedElement.setFocus(false);
+                this.subDirectories[++indexDir].setFocus(true);
+                successfull = true;
+            } else if (indexDir == (this.subDirectories.length - 1) && (this.subDirectories.length > 0) && (this.files.length > 0)) {
+                // We are in the middle
+                focusedElement.setFocus(false);
+                this.files[0].setFocus(true);
+                successfull = true;
+
+            } else if (indexFile > -1 && indexFile < (this.files.length - 1)) {
+                // We are in the file section
+                focusedElement.setFocus(false);
+                this.files[++indexFile].setFocus(true);
+                successfull = true;
+            }
+        }
+
+        return successfull;
+    }
+
+    /**
+     * This operation sets the focus on the first child of the expanded directory
+     *
+     * @private
+     * @param {Directory} dir
+     * @returns {boolean}
+     * @memberof Directory
+     */
+    private moveDownServiceChildDir(dir: Directory): boolean {
+        var successfull = false;
+        var subDir = dir.getSubDirectories();
+        var subFiles = dir.getFiles();
+        if (subDir.length > 0) {
+            dir.setFocus(false);
+            subDir[0].setFocus(true);
+            successfull = true;
+        } else if (subFiles.length > 0) {
+            dir.setFocus(false);
+            subFiles[0].setFocus(true);
+            successfull = true;
+        }
+        return successfull;
+
+    }
 
 
 
 }
+
+
+
+
+
 
 class File extends DirElement {
 

@@ -5,40 +5,73 @@ import { CSS } from '../Css';
 import './FileTreeComp';
 import "./NaviComp";
 
+import { reduxStoreInstance, State } from '../ReduxStore';
+import { RedP3ElectronApp, TAB_PRESSED } from '../reducers/RedP3ElectronApp';
+
+
 
 
 
 class P3ElectronApp extends Component {
+  _reducer: RedP3ElectronApp;
+
 
 
   constructor() {
     super();
 
+    this._reducer = new RedP3ElectronApp();
+    reduxStoreInstance.registerReducer(this._reducer);
+    reduxStoreInstance.subscribe(() => this.reduxtrigger(reduxStoreInstance));
+
+    document.addEventListener("keydown", (event: KeyboardEvent) => {
+      let element = event.currentTarget as HTMLScriptElement;
+      this._reducer.boundActionKeyPressed(event.keyCode);
+    });
 
   }
 
   connectedCallback() {
     console.log('P3ElectronApp added to page.');
+    super.connectedCallback();
+
+
 
   }
 
+  registerCallBack() {
+
+
+
+    var appState = this._reducer._store.getState();
+    var activWindowId = appState.activeWindow;
+    var activeWindow = this.shadowRoot.getElementById(activWindowId) as HTMLScriptElement;
+    activeWindow.classList.add("focused");
+  }
+
   getHTML() {
+
+
+
 
     return Component.html` 
         ${CSS}
         
        <style>
            
+            .focused{
+              box-shadow: 0px 0px 13px 0px black;
+            }
             .menuarea {
               grid-area: menu; 
               
             }
-            .leftarea { 
+            .leftWindow { 
                 grid-area: left; 
                 overflow: auto;
                 
                 }
-            .rightarea { 
+            .rightWindow { 
                 grid-area: right; 
                 overflow: auto;
                 }
@@ -76,9 +109,6 @@ class P3ElectronApp extends Component {
                 font-size: 30px;
             }
 
-
-
-
         </style>
 
         <div class="grid-container-main">
@@ -86,12 +116,12 @@ class P3ElectronApp extends Component {
             <div class="menuarea">
             </div>
              
-            <div class="leftarea">
+            <div class="leftWindow" id="leftDirTree">
                <navi-view id="leftDirTree"></navi-view>
                <file-tree id="leftDirTree"></file-tree>
             </div>
 
-            <div class="rightarea">
+            <div class="rightWindow" id="rightDirTree" >
                <navi-view id="rightDirTree"></navi-view>
                <file-tree id="rightDirTree"></file-tree>
             </div>
@@ -102,6 +132,14 @@ class P3ElectronApp extends Component {
         </div>
  
     `;
+  }
+  reduxtrigger(storeInstance) {
+
+    var state: State = storeInstance.getState();
+    if (state.action === TAB_PRESSED) {
+
+      this.update();
+    }
   }
 }
 

@@ -1,14 +1,16 @@
-//import { LitElement, html } from '@polymer/lit-element';
+
 import { Component } from '../lib/Component';
 import { CSS } from '../Css';
 import { reduxStoreInstance, State } from '../ReduxStore';
 import { Directory as FileTreeDir, File as FileTreeFile } from '../lib/FileTree';
 import { RedFileTree, ELEMENT_CLICKED } from '../reducers/RedFileTree';
+import { ARROW_PRESSED } from '../reducers/RedP3ElectronApp';
 
 
 
 const path = require('path');
-const feather = require('feather-icons')
+const feather = require('feather-icons');
+
 
 const MIME_TEXT = 'text/plain';
 const MIME_BINARY = 'application/octet-stream';
@@ -51,18 +53,33 @@ class FileTreeComp extends Component {
         var i;
 
         for (i = 0; i < directories.length; i++) {
-            this.addEventListeners(directories[i]);
+            var directory = directories[i] as HTMLScriptElement;
 
-            directories[i].addEventListener("dblclick", (ev) => {
+            if (directory.classList.contains("focused")) {
+                directory.focus();
+            }
+
+
+            this.addEventListeners(directory);
+
+            directory.addEventListener("dblclick", (ev) => {
                 let clickedElement = ev.target as HTMLScriptElement;
                 this._reducer.boundActionDirDblClicked(clickedElement.id, this.id);
             });
+
+
         }
 
         for (i = 0; i < files.length; i++) {
-            this.addEventListeners(files[i]);
+            var file = files[i] as HTMLScriptElement;
 
-            files[i].addEventListener("dblclick", (ev) => {
+            if (file.classList.contains("focused")) {
+                file.focus();
+            }
+
+            this.addEventListeners(file);
+
+            file.addEventListener("dblclick", (ev) => {
                 let clickedElement = ev.target as HTMLScriptElement;
                 this._reducer.boundActionFileDblClicked(clickedElement.id, this.id);
             });
@@ -70,6 +87,9 @@ class FileTreeComp extends Component {
     }
 
     private addEventListeners(element: Element) {
+
+
+
         element.addEventListener("click", (ev) => {
             let clickedElement = ev.target as HTMLScriptElement;
             this._reducer.boundActionElementClicked(clickedElement.id, this.id);
@@ -158,6 +178,10 @@ class FileTreeComp extends Component {
             element.style.opacity = '1.0';
 
         });
+
+
+
+
     }
 
     getHTML() {
@@ -299,10 +323,15 @@ class FileTreeComp extends Component {
     reduxtrigger(storeInstance) {
 
         var state: State = storeInstance.getState();
-        if (state.action === ELEMENT_CLICKED) {
 
-            this.update();
+        switch (state.action) {
+            case ELEMENT_CLICKED:
+            case ARROW_PRESSED:
+                this.update();
+                break;
+            default:
         }
+
     }
 }
 
