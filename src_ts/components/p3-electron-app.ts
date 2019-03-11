@@ -27,6 +27,7 @@ class P3ElectronApp extends Component {
     document.addEventListener("keydown", (event: KeyboardEvent) => {
       let element = event.currentTarget as HTMLScriptElement;
       this._reducer.boundActionKeyPressed(event.keyCode);
+      event.preventDefault();
     });
 
   }

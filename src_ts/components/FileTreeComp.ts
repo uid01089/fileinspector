@@ -5,6 +5,7 @@ import { reduxStoreInstance, State } from '../ReduxStore';
 import { Directory as FileTreeDir, File as FileTreeFile } from '../lib/FileTree';
 import { RedFileTree, ELEMENT_CLICKED } from '../reducers/RedFileTree';
 import { ARROW_PRESSED } from '../reducers/RedP3ElectronApp';
+import { Util } from '../lib/Util';
 
 
 
@@ -56,7 +57,9 @@ class FileTreeComp extends Component {
             var directory = directories[i] as HTMLScriptElement;
 
             if (directory.classList.contains("focused")) {
-                directory.focus();
+                directory.focus({ preventScroll: true });
+                directory.scrollIntoView(false);
+
             }
 
 
@@ -74,7 +77,10 @@ class FileTreeComp extends Component {
             var file = files[i] as HTMLScriptElement;
 
             if (file.classList.contains("focused")) {
-                file.focus();
+                file.focus({ preventScroll: true });
+                file.scrollIntoView(false);
+
+
             }
 
             this.addEventListeners(file);
