@@ -2,9 +2,10 @@
 import { Component } from '../lib/Component';
 import { CSS } from '../Css';
 import { ELEMENT_CLICKED } from '../reducers/RedFileTree';
-import { RedNaviComp } from '../reducers/RedNaviComp';
+import { RedNaviComp, SET_TRAIL } from '../reducers/RedNaviComp';
 import { reduxStoreInstance, State } from '../ReduxStore';
 import { FileTree } from '../lib/FileTree';
+import { ARROW_PRESSED } from '../reducers/RedP3ElectronApp';
 
 
 
@@ -15,6 +16,7 @@ class NaviComp extends Component {
     constructor() {
         super();
         this.id = this.getAttribute('id');
+
 
         this._reducer = new RedNaviComp();
         reduxStoreInstance.registerReducer(this._reducer);
@@ -28,6 +30,15 @@ class NaviComp extends Component {
         console.log('Context Menu.');
 
     }
+
+    registerCallBack() {
+        var homeButton = this.shadowRoot.getElementById("homeButton");
+        homeButton.addEventListener("click", (ev) => {
+            var homeDir = process.env.HOME;
+            this._reducer.setTrail(homeDir, this.id);
+        })
+    }
+
 
     getHTML() {
 
@@ -46,6 +57,14 @@ class NaviComp extends Component {
             height: 20px;
             grid-area: backBtn; 
             }
+            .homeButton { 
+            background: url("icons/baseline_home_black_18dp.png") no-repeat top left; 
+            cursor: pointer;
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            grid-area: backBtn; 
+            }            
             .upButton { 
             background: url("icons/baseline_arrow_upward_black_18dp.png") no-repeat top left; 
             cursor: pointer;
@@ -77,8 +96,9 @@ class NaviComp extends Component {
 
         </style>
         <div class="navi-container">
-                <button class="backButton"></button>
-                <button class="upButton"></button>
+                <button id="homeButton" class="homeButton"></button>
+                <button id="backButton" class="backButton"></button>
+                <button id="upButton" class="upButton"></button>
                 <input type="text" class="trail" value="${tree.getCurrentPath()}">
                 <input type="text" class="pattern">
         </div>
@@ -89,9 +109,14 @@ class NaviComp extends Component {
     reduxtrigger(storeInstance) {
 
         var state: State = storeInstance.getState();
-        if (state.action === ELEMENT_CLICKED) {
 
-            this.update();
+        switch (state.action) {
+            case ELEMENT_CLICKED:
+            case ARROW_PRESSED:
+            case SET_TRAIL:
+                this.update();
+                break;
+            default:
         }
     }
 

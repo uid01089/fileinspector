@@ -6,6 +6,7 @@ import { Directory as FileTreeDir, File as FileTreeFile } from '../lib/FileTree'
 import { RedFileTree, ELEMENT_CLICKED } from '../reducers/RedFileTree';
 import { ARROW_PRESSED } from '../reducers/RedP3ElectronApp';
 import { Util } from '../lib/Util';
+import { SET_TRAIL } from '../reducers/RedNaviComp';
 
 
 
@@ -52,6 +53,8 @@ class FileTreeComp extends Component {
         var directories = this.shadowRoot.querySelectorAll(".directory");
         var files = this.shadowRoot.querySelectorAll(".file");
         var i;
+
+
 
         for (i = 0; i < directories.length; i++) {
             var directory = directories[i] as HTMLScriptElement;
@@ -333,6 +336,7 @@ class FileTreeComp extends Component {
         switch (state.action) {
             case ELEMENT_CLICKED:
             case ARROW_PRESSED:
+            case SET_TRAIL:
                 this.update();
                 break;
             default:

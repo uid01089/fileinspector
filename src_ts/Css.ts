@@ -53,7 +53,7 @@ const CSS = Component.html`
             .button:hover {
                 background-color: rgba(0,0,0,0.5);
             }  
-            .btn-group button {
+            .btn-group  button {
                 background-color: #ccc; 
                 border: none;
                 color: black;
@@ -74,10 +74,29 @@ const CSS = Component.html`
             }
 
             /* Add a background color on hover */
-            .btn-group button:hover {
+            .btn-group  button:hover {
             background-color: rgba(0,0,0,0.5);
             }          
-        </style>
+                .btn-group-horizontal button {
+                background-color: #ccc; /* Green background */
+                border: none; /* Green border */
+                color: black; /* White text */
+                padding: 10px 24px; /* Some padding */
+                cursor: pointer; /* Pointer/hand icon */
+                float: left; /* Float the buttons side by side */
+                }
+
+                .btn-group-horizontal button:not(:last-child) {
+                border-right: none; /* Prevent double borders */
+                }
+
+
+
+                /* Add a background color on hover */
+                .btn-group-horizontal button:hover {
+                background-color: rgba(0,0,0,0.5);
+                }
+                </style>
         `;
 
 export { CSS };

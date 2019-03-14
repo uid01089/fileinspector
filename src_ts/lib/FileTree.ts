@@ -1,7 +1,10 @@
+import { Stats } from "fs";
+
 const fs = require('fs');
 const path = require('path');
 
 class FileTree {
+
 
     trail: string;
     rootDir: Directory;
@@ -18,6 +21,10 @@ class FileTree {
 
     getRootDir(): Directory {
         return this.rootDir;
+    }
+
+    setRootDir(trail: string) {
+        this.rootDir = new Directory(null, trail);
     }
 
     getCurrentElement(): DirElement {
@@ -38,6 +45,35 @@ class FileTree {
             element.setFocus(false);
         });
     }
+
+    setTrail(trail: string): any {
+
+        if (fs.existsSync(trail)) {
+            var fileStat = fs.statSync(trail) as Stats;
+
+            if (fileStat.isDirectory()) {
+                this.removeFocus();
+                this.setRootDir(trail);
+                this.trail = trail;
+                this.rootDir.expand();
+                this.rootDir.setFocus(true);
+
+
+            } else if (fileStat.isFile()) {
+                var parent = path.dirname(trail);
+                this.removeFocus();
+                this.setRootDir(trail);
+                this.trail = trail;
+                this.rootDir.expand();
+
+                var element = this.findElement(trail.trim());
+                element.setFocus(true);
+            }
+        }
+
+
+    }
+
 
     /**
      *Handling click event

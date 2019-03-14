@@ -4,6 +4,7 @@ import { Component } from '../lib/Component';
 import { CSS } from '../Css';
 import './FileTreeComp';
 import "./NaviComp";
+import "./ButtonBarComp";
 
 import { reduxStoreInstance, State } from '../ReduxStore';
 import { RedP3ElectronApp, TAB_PRESSED } from '../reducers/RedP3ElectronApp';
@@ -66,18 +67,22 @@ class P3ElectronApp extends Component {
             .menuarea {
               grid-area: menu; 
               
+              
             }
             .leftWindow { 
                 grid-area: left; 
                 overflow: auto;
+                height: 70vh;
                 
                 }
             .rightWindow { 
                 grid-area: right; 
                 overflow: auto;
+                height: 70vh;
                 }
             .terminalarea{
               grid-area: terminal; 
+              height: 20vh;
             }
 
 
@@ -86,14 +91,6 @@ class P3ElectronApp extends Component {
                 grid-template-areas:
                     'menu  menu'
                     'left right'
-                    'left right'
-                    'left right'
-                    'left right'
-                    'left right'
-                    'left right'
-                    'left right'
-                    'terminal terminal'
-                    'terminal terminal'
                     'terminal terminal'
                     ;
                 grid-gap: 5px;
@@ -115,6 +112,7 @@ class P3ElectronApp extends Component {
         <div class="grid-container-main">
             
             <div class="menuarea">
+            <buttonbar-view></buttonbar-view>
             </div>
              
             <div class="leftWindow" id="leftDirTree">
