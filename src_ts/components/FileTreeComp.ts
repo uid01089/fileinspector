@@ -3,10 +3,9 @@ import { Component } from '../lib/Component';
 import { CSS } from '../Css';
 import { reduxStoreInstance, State } from '../ReduxStore';
 import { Directory as FileTreeDir, File as FileTreeFile } from '../lib/FileTree';
-import { RedFileTree, ELEMENT_CLICKED } from '../reducers/RedFileTree';
-import { ARROW_PRESSED } from '../reducers/RedP3ElectronApp';
-import { Util } from '../lib/Util';
+import { RedFileTree, ELEMENT_CLICKED, ARROW_PRESSED } from '../reducers/RedFileTree';
 import { SET_TRAIL } from '../reducers/RedNaviComp';
+import { TAB_PRESSED } from '../reducers/RedP3ElectronApp'
 
 
 
@@ -20,6 +19,7 @@ const MIME_UNKNOWN = 'application/unknown';
 
 const DOWNLOADURL = 'DownloadURL';
 const RESOURCEURLS = 'ResourceURLs';
+
 
 
 
@@ -62,6 +62,10 @@ class FileTreeComp extends Component {
             if (directory.classList.contains("focused")) {
                 directory.focus({ preventScroll: true });
                 directory.scrollIntoView(false);
+                directory.addEventListener("keydown", (ev) => {
+                    this._reducer.boundActionKeyPressed(ev.keyCode, this.id);
+                })
+
 
             }
 
@@ -71,6 +75,7 @@ class FileTreeComp extends Component {
             directory.addEventListener("dblclick", (ev) => {
                 let clickedElement = ev.target as HTMLScriptElement;
                 this._reducer.boundActionDirDblClicked(clickedElement.id, this.id);
+                ev.preventDefault();
             });
 
 
@@ -82,6 +87,9 @@ class FileTreeComp extends Component {
             if (file.classList.contains("focused")) {
                 file.focus({ preventScroll: true });
                 file.scrollIntoView(false);
+                file.addEventListener("keydown", (ev) => {
+                    this._reducer.boundActionKeyPressed(ev.keyCode, this.id);
+                })
 
 
             }
@@ -91,6 +99,7 @@ class FileTreeComp extends Component {
             file.addEventListener("dblclick", (ev) => {
                 let clickedElement = ev.target as HTMLScriptElement;
                 this._reducer.boundActionFileDblClicked(clickedElement.id, this.id);
+                ev.preventDefault();
             });
         }
     }
@@ -280,7 +289,7 @@ class FileTreeComp extends Component {
 
     private getTreeHtml(id: string): string {
         var htmlTree = "";
-        htmlTree = htmlTree.concat(Component.html`<ul id="htmlTree">`);
+        htmlTree = htmlTree.concat(Component.html`<ul id="htmlTree" contenteditable="false">`);
 
         let tree = reduxStoreInstance.getState()[id];
         let root = tree.getRootDir();
@@ -304,7 +313,7 @@ class FileTreeComp extends Component {
 
 
 
-        html = html.concat(Component.html`<li><span class="${classes}" draggable="true" id="${dir.getPath()}">${dir.getName()}</span>`);
+        html = html.concat(Component.html`<li contenteditable="false"><span class="${classes}" draggable="true" id="${dir.getPath()}" contenteditable="true">${dir.getName()}</span>`);
         html = html.concat(Component.html`<ul class="nested">`);
 
         dir.getSubDirectories().forEach(subDir => {
@@ -320,7 +329,7 @@ class FileTreeComp extends Component {
                 classes = "file";
             }
 
-            html = html.concat(Component.html`<li class="${classes}" draggable="true" id="${file.getPath()}"><span>${file.getName()}</span></li>`);
+            html = html.concat(Component.html`<li contenteditable="false"><span class="${classes}" draggable="true" id="${file.getPath()}" contenteditable="true">${file.getName()}</span></li>`);
         });
 
 
@@ -333,13 +342,17 @@ class FileTreeComp extends Component {
 
         var state: State = storeInstance.getState();
 
-        switch (state.action) {
-            case ELEMENT_CLICKED:
-            case ARROW_PRESSED:
-            case SET_TRAIL:
-                this.update();
-                break;
-            default:
+        if (state.activeWindow === this.id) {
+
+            switch (state.action) {
+                case ELEMENT_CLICKED:
+                case ARROW_PRESSED:
+                case SET_TRAIL:
+                case TAB_PRESSED:
+                    this.update();
+                    break;
+                default:
+            }
         }
 
     }

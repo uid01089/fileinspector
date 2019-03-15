@@ -23,6 +23,7 @@ class RedNaviComp extends AbstractReducer {
                     state.action = actionElementClicked.type;
                     var tree = state[actionElementClicked.id] as FileTree;
                     tree.setTrail(actionElementClicked.trail);
+                    state.activeWindow = actionElementClicked.id;
                     return state;
                 }
 

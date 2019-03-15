@@ -8,6 +8,8 @@ import "./ButtonBarComp";
 
 import { reduxStoreInstance, State } from '../ReduxStore';
 import { RedP3ElectronApp, TAB_PRESSED } from '../reducers/RedP3ElectronApp';
+import { ELEMENT_CLICKED } from '../reducers/RedFileTree';
+import { SET_TRAIL } from '../reducers/RedNaviComp';
 
 
 
@@ -28,7 +30,9 @@ class P3ElectronApp extends Component {
     document.addEventListener("keydown", (event: KeyboardEvent) => {
       let element = event.currentTarget as HTMLScriptElement;
       this._reducer.boundActionKeyPressed(event.keyCode);
-      event.preventDefault();
+      if (event.keyCode == 9) {
+        event.preventDefault();
+      }
     });
 
   }
@@ -135,10 +139,17 @@ class P3ElectronApp extends Component {
   reduxtrigger(storeInstance) {
 
     var state: State = storeInstance.getState();
-    if (state.action === TAB_PRESSED) {
 
-      this.update();
+    switch (state.action) {
+      case ELEMENT_CLICKED:
+      case TAB_PRESSED:
+      case SET_TRAIL:
+        this.update();
+        break;
+      default:
     }
+
+
   }
 }
 

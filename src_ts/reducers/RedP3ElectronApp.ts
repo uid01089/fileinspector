@@ -3,9 +3,8 @@ import { Action } from 'redux';
 import { State, LEFTDIRTREE, RIGHTDIRTREE } from '../ReduxStore';
 import { FileTree } from '../lib/FileTree.js';
 
-const KEY_PRESSED = "KEY_PRESSED";
 const TAB_PRESSED = "TAB_PRESSED";
-const ARROW_PRESSED = "ARROW_PRESSED";
+
 
 interface ActionKeyPressed extends Action {
     keyCode: number
@@ -19,7 +18,7 @@ class RedP3ElectronApp extends AbstractReducer {
 
         switch (action.type) {
 
-            case KEY_PRESSED:
+            case TAB_PRESSED:
                 {
                     var actionKeyPressed = action as ActionKeyPressed;
 
@@ -27,7 +26,7 @@ class RedP3ElectronApp extends AbstractReducer {
                     switch (actionKeyPressed.keyCode) {
 
                         case 9:
-                            state.action = TAB_PRESSED;
+                            state.action = action.type;
 
                             if (state.activeWindow === LEFTDIRTREE) {
                                 state.activeWindow = RIGHTDIRTREE;
@@ -35,16 +34,8 @@ class RedP3ElectronApp extends AbstractReducer {
                                 state.activeWindow = LEFTDIRTREE;
                             }
                             break;
-                        case 37:
-                        case 38:
-                        case 39:
-                        case 40:
-                            state.action = ARROW_PRESSED;
-                            fileTree.keyPressed(actionKeyPressed.keyCode);
-                            break;
 
-                        default:
-                            state.action = actionKeyPressed.type;
+
                     }
 
                     return state;
@@ -55,11 +46,17 @@ class RedP3ElectronApp extends AbstractReducer {
 
     boundActionKeyPressed(keyCode: number, ): any {
         const action: ActionKeyPressed = {
-            type: KEY_PRESSED,
+            type: TAB_PRESSED,
             keyCode: keyCode
         }
-        this._store.dispatch(action);
+
+        switch (keyCode) {
+
+            case 9:
+                this._store.dispatch(action);
+
+        }
     }
 }
 
-export { RedP3ElectronApp, KEY_PRESSED, TAB_PRESSED, ARROW_PRESSED };
+export { RedP3ElectronApp, TAB_PRESSED };

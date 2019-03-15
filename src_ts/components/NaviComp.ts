@@ -1,11 +1,11 @@
 //import { LitElement, html } from '@polymer/lit-element';
 import { Component } from '../lib/Component';
 import { CSS } from '../Css';
-import { ELEMENT_CLICKED } from '../reducers/RedFileTree';
+import { ELEMENT_CLICKED, ARROW_PRESSED } from '../reducers/RedFileTree';
 import { RedNaviComp, SET_TRAIL } from '../reducers/RedNaviComp';
 import { reduxStoreInstance, State } from '../ReduxStore';
 import { FileTree } from '../lib/FileTree';
-import { ARROW_PRESSED } from '../reducers/RedP3ElectronApp';
+
 
 
 
