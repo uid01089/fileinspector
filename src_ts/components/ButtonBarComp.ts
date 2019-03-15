@@ -23,7 +23,52 @@ class ButtonBarComp extends Component {
     connectedCallback() {
         super.connectedCallback();
 
-        console.log('Context Menu.');
+
+    }
+
+    registerCallBack() {
+
+
+        var button1 = this.shadowRoot.getElementById("Button1");
+        button1.addEventListener("click", (ev) => {
+
+        });
+
+        // This event is fired continuously when an element or text selection is being dragged and the 
+        // mouse pointer is over a valid drop target(every 50 ms WHEN mouse is not moving ELSE much faster 
+        // between 5 ms(slow movement) and 1ms(fast movement) approximately.This firing pattern is different than mouseover).
+        button1.addEventListener("dragover", (ev) => {
+            let element = ev.target as HTMLScriptElement;
+            (ev as DragEvent).dataTransfer.dropEffect = 'move';
+
+            if (ev.preventDefault) {
+                ev.preventDefault(); // Necessary. Allows us to drop.
+            }
+
+            return false;
+        });
+
+
+        //This event is fired when an element or text selection is dropped on a valid drop target.
+        button1.addEventListener("drop", (ev) => {
+            if (ev.stopPropagation) {
+                ev.stopPropagation(); // stops the browser from redirecting.
+            }
+
+            let element = ev.target as HTMLScriptElement;
+
+            var type = (ev as DragEvent).dataTransfer.types[0];
+
+            var data = (ev as DragEvent).dataTransfer.getData(type);
+
+            var fileList = (ev as DragEvent).dataTransfer.files;
+
+            console.log(fileList);
+
+
+
+        });
+
 
     }
 
@@ -31,10 +76,10 @@ class ButtonBarComp extends Component {
 
         var buttonString: string = "";
         buttonString = buttonString.concat(Component.html`
-            <button id="xxx">Button1</button>
+            <button id="Button1">Button1</button>
         `);
         buttonString = buttonString.concat(Component.html`
-            <button id="xxxx">Button2</button>
+            <button id="Button2">Button2</button>
         `);
         return Component.html` 
             
@@ -42,6 +87,7 @@ class ButtonBarComp extends Component {
             
             
             <style>
+
 
             </style>
 
