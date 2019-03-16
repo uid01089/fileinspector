@@ -8,12 +8,12 @@ This application is under development. It is more or less a proof of concept.
 
 ## Contents
 1. [Overview](#overview)
-2. [Build](#build)
-   2.1. [Dependencies](#dependencies)
-   2.2. [Get the Code](#get-the-code)
-   2.3. [Build](#build)
-3. [Contributing](#contributing)
-4. [FAQ](#faq)
+1. [Build](#build)
+   1. [Dependencies](#dependencies)
+   2. [Get the Code](#get-the-code)
+   3. [Build](#build)
+1. [Contributing](#contributing)
+1. [FAQ](#faq)
 
 ## Overview
 FileInspector is a Two-Window-FileCommander. The mainly motivations were
