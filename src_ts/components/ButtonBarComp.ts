@@ -28,59 +28,84 @@ class ButtonBarComp extends Component {
 
     registerCallBack() {
 
+        var state = reduxStoreInstance.getState();
+        var buttonConfig = state.buttonBarData;
 
-        var button1 = this.shadowRoot.getElementById("Button1");
-        button1.addEventListener("click", (ev) => {
+        var i = 0;
+
+        buttonConfig.buttons.forEach(button => {
+
+            const y = i;
+
+            var button1 = this.shadowRoot.getElementById("" + i);
+            button1.addEventListener("click", (ev) => {
+
+                this._reducer.handleButton(y, "");
+
+            });
+
+
+            // This event is fired continuously when an element or text selection is being dragged and the 
+            // mouse pointer is over a valid drop target(every 50 ms WHEN mouse is not moving ELSE much faster 
+            // between 5 ms(slow movement) and 1ms(fast movement) approximately.This firing pattern is different than mouseover).
+            button1.addEventListener("dragover", (ev) => {
+                let element = ev.target as HTMLScriptElement;
+                (ev as DragEvent).dataTransfer.dropEffect = 'move';
+
+                if (ev.preventDefault) {
+                    ev.preventDefault(); // Necessary. Allows us to drop.
+                }
+
+                return false;
+            });
+
+
+            //This event is fired when an element or text selection is dropped on a valid drop target.
+            button1.addEventListener("drop", (ev) => {
+                if (ev.stopPropagation) {
+                    ev.stopPropagation(); // stops the browser from redirecting.
+                }
+
+                let element = ev.target as HTMLScriptElement;
+
+                var type = "resourceurls";
+
+                var data = (ev as DragEvent).dataTransfer.getData(type);
+
+                var fileList = (ev as DragEvent).dataTransfer.files;
+
+                this._reducer.handleButton(y, data);
+
+
+
+            });
+
+            // Increment counter
+            i++;
 
         });
 
-        // This event is fired continuously when an element or text selection is being dragged and the 
-        // mouse pointer is over a valid drop target(every 50 ms WHEN mouse is not moving ELSE much faster 
-        // between 5 ms(slow movement) and 1ms(fast movement) approximately.This firing pattern is different than mouseover).
-        button1.addEventListener("dragover", (ev) => {
-            let element = ev.target as HTMLScriptElement;
-            (ev as DragEvent).dataTransfer.dropEffect = 'move';
 
-            if (ev.preventDefault) {
-                ev.preventDefault(); // Necessary. Allows us to drop.
-            }
-
-            return false;
-        });
-
-
-        //This event is fired when an element or text selection is dropped on a valid drop target.
-        button1.addEventListener("drop", (ev) => {
-            if (ev.stopPropagation) {
-                ev.stopPropagation(); // stops the browser from redirecting.
-            }
-
-            let element = ev.target as HTMLScriptElement;
-
-            var type = (ev as DragEvent).dataTransfer.types[0];
-
-            var data = (ev as DragEvent).dataTransfer.getData(type);
-
-            var fileList = (ev as DragEvent).dataTransfer.files;
-
-            console.log(fileList);
-
-
-
-        });
 
 
     }
 
     getHTML() {
 
+        var state = reduxStoreInstance.getState();
+        var buttonConfig = state.buttonBarData;
+
+        var i = 0;
         var buttonString: string = "";
-        buttonString = buttonString.concat(Component.html`
-            <button id="Button1">Button1</button>
-        `);
-        buttonString = buttonString.concat(Component.html`
-            <button id="Button2">Button2</button>
-        `);
+        buttonConfig.buttons.forEach(button => {
+            buttonString = buttonString.concat(Component.html`
+            <button id="${"" + i}">${button.title}</button>
+            `);
+
+            // Increment counter
+            i++;
+        });
+
         return Component.html` 
             
             ${CSS}
