@@ -3,7 +3,7 @@ import { Action } from 'redux';
 import { State } from '../ReduxStore';
 
 
-const { spawn } = require('child_process');
+
 const { exec } = require('child_process');
 
 

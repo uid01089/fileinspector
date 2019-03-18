@@ -28,11 +28,7 @@ class ContextMenu extends Component {
         let ident = this.getAttribute('ident');
 
         let targetElement = parent.querySelector('#' + elementId);
-        targetElement.addEventListener(type, (ev) => {
 
-            this.toggleMenuOn();
-            this.positionMenu(ev as MouseEvent);
-        });
 
 
 
@@ -45,6 +41,13 @@ class ContextMenu extends Component {
 
         document.addEventListener('click', (ev) => {
             this.toggleMenuOff();
+        });
+
+
+        targetElement.addEventListener(type, (ev) => {
+
+            this.toggleMenuOn();
+            this.positionMenu(ev as MouseEvent);
         });
 
 

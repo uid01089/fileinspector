@@ -6,6 +6,8 @@ import { Directory as FileTreeDir, File as FileTreeFile } from '../lib/FileTree'
 import { RedFileTree, ELEMENT_CLICKED, ARROW_PRESSED } from '../reducers/RedFileTree';
 import { SET_TRAIL } from '../reducers/RedNaviComp';
 import { TAB_PRESSED } from '../reducers/RedP3ElectronApp'
+import '../lib/components/ContextMenu';
+import { ContextEventResult } from '../lib/components/ContextMenu';
 
 
 
@@ -52,9 +54,23 @@ class FileTreeComp extends Component {
     registerCallBack() {
         var directories = this.shadowRoot.querySelectorAll(".directory");
         var files = this.shadowRoot.querySelectorAll(".file");
+        var dirMenues = this.shadowRoot.querySelectorAll(".dirMenu");
         var i;
 
+        for (i = 0; i < dirMenues.length; i++) {
+            var dirMenue = dirMenues[i] as HTMLScriptElement;
+            dirMenue.addEventListener('valueSelected', (e: CustomEvent) => {
+                var details: ContextEventResult = e.detail;
 
+                switch (details.command) {
+                    case 'terminal':
+                        this._reducer.boundActionTerminalHere(details.ident, this.id);
+                        break;
+                    default:
+                }
+
+            });
+        }
 
         for (i = 0; i < directories.length; i++) {
             var directory = directories[i] as HTMLScriptElement;
@@ -74,9 +90,11 @@ class FileTreeComp extends Component {
 
             directory.addEventListener("dblclick", (ev) => {
                 let clickedElement = ev.target as HTMLScriptElement;
-                this._reducer.boundActionDirDblClicked(clickedElement.id, this.id);
+                this._reducer.boundActionDirDblClicked(clickedElement.getAttribute("kPath"), this.id);
                 ev.preventDefault();
             });
+
+
 
 
         }
@@ -98,7 +116,7 @@ class FileTreeComp extends Component {
 
             file.addEventListener("dblclick", (ev) => {
                 let clickedElement = ev.target as HTMLScriptElement;
-                this._reducer.boundActionFileDblClicked(clickedElement.id, this.id);
+                this._reducer.boundActionFileDblClicked(clickedElement.getAttribute("kPath"), this.id);
                 ev.preventDefault();
             });
         }
@@ -106,12 +124,12 @@ class FileTreeComp extends Component {
 
     private addEventListeners(element: Element) {
 
-
-
         element.addEventListener("click", (ev) => {
             let clickedElement = ev.target as HTMLScriptElement;
-            this._reducer.boundActionElementClicked(clickedElement.id, this.id);
+            this._reducer.boundActionElementClicked(clickedElement.getAttribute("kPath"), this.id);
         });
+
+
 
 
 
@@ -120,13 +138,13 @@ class FileTreeComp extends Component {
             let element = ev.target as HTMLScriptElement;
             element.style.opacity = '0.4';
 
-            var uri = [MIME_BINARY, path.basename(element.id), "file:" + element.id].join(':');
+            var uri = [MIME_BINARY, path.basename(element.getAttribute("kPath")), "file:" + element.getAttribute("kPath")].join(':');
 
             // Data for dragging it to outside of the browser window
             (ev as DragEvent).dataTransfer.setData(DOWNLOADURL, uri);
 
             // Data for dragging it within this application
-            (ev as DragEvent).dataTransfer.setData(RESOURCEURLS, JSON.stringify([element.id]));
+            (ev as DragEvent).dataTransfer.setData(RESOURCEURLS, JSON.stringify([element.getAttribute("kPath")]));
 
         });
 
@@ -287,6 +305,14 @@ class FileTreeComp extends Component {
         `;
     }
 
+    /**
+     * This operation builds up the HTML-Tree, out from the redux state
+     *
+     * @private
+     * @param {string} id identifier of the tree within the redux state
+     * @returns {string} HTML string of the tree
+     * @memberof FileTreeComp
+     */
     private getTreeHtml(id: string): string {
         var htmlTree = "";
         htmlTree = htmlTree.concat(Component.html`<ul id="htmlTree" contenteditable="false">`);
@@ -301,9 +327,18 @@ class FileTreeComp extends Component {
         return htmlTree;
     }
 
+    /**
+     *This operation is called recursivly. 
+     *
+     * @private
+     * @param {FileTreeDir} dir
+     * @returns {string}
+     * @memberof FileTreeComp
+     */
     private getNodeHtml(dir: FileTreeDir): string {
         var html = "";
 
+        // Build current tree
         let classes;
         if (dir.getFocus()) {
             classes = "directory focused";
@@ -311,16 +346,32 @@ class FileTreeComp extends Component {
             classes = "directory";
         }
 
+        let menuEntries = {
+            "Copy": "copy",
+            "Delete": "delete",
+            "Terminal%20here": "terminal",
+        };
 
 
-        html = html.concat(Component.html`<li contenteditable="false"><span class="${classes}" draggable="true" id="${dir.getPath()}" contenteditable="true">${dir.getName()}</span>`);
+
+
+        html = html.concat(Component.html`<li contenteditable="false"><span class="${classes}" draggable="true" kPath="${dir.getPath()}" id="${this.creationPathToId(dir.getPath())}"
+        contenteditable="true">${dir.getName()}</span>`);
+        html = html.concat(Component.html`
+            <context-menu id="${" context" + dir.getPath()}" class="dirMenu" elementId="${this.creationPathToId(dir.getPath())}"
+                menu-entries=${JSON.stringify(menuEntries)} type=contextmenu ident="${dir.getPath()}">
+            </context-menu>
+        `);
         html = html.concat(Component.html`<ul class="nested">`);
 
+
+        // Dive into tree
         dir.getSubDirectories().forEach(subDir => {
             html = html.concat(this.getNodeHtml(subDir));
         });
 
 
+        // Populate all files belonging to this node
         dir.getFiles().forEach(file => {
             let classes;
             if (file.getFocus()) {
@@ -329,13 +380,20 @@ class FileTreeComp extends Component {
                 classes = "file";
             }
 
-            html = html.concat(Component.html`<li contenteditable="false"><span class="${classes}" draggable="true" id="${file.getPath()}" contenteditable="true">${file.getName()}</span></li>`);
+            html = html.concat(Component.html`<li contenteditable="false"><span class="${classes}" draggable="true" kPath="${file.getPath()}" id="${this.creationPathToId(file.getPath())}"
+        contenteditable="true">${file.getName()}</span></li>`);
         });
 
 
         html = html.concat(Component.html`</ul>`);
         html = html.concat(Component.html`</li>`);
         return html;
+    }
+
+    private creationPathToId(path: string): string {
+
+        var modifyString = "x" + path.replace(/\W/g, "");
+        return modifyString;
     }
 
     reduxtrigger(storeInstance) {

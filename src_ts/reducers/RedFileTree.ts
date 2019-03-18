@@ -3,6 +3,8 @@ import { Action } from 'redux';
 import { State } from '../ReduxStore';
 import { FileTree } from '../lib/FileTree.js';
 
+const { exec } = require('child_process');
+
 
 const ELEMENT_CLICKED = "ELEMENT_CLICKED";
 const DIR_DBLCLICKED = "DIR_DBLCLICKED";
@@ -110,9 +112,15 @@ class RedFileTree extends AbstractReducer {
                 break;
 
         }
+    }
 
-
-
+    boundActionTerminalHere(trail: string, id: string) {
+        var command = "/Applications/Utilities/Terminal.app/Contents/MacOS/Terminal " + trail;
+        exec(command, (err, stdout, stderr) => {
+            console.log(err);
+            console.log(stdout);
+            console.log(stderr);
+        });
     }
 
 
