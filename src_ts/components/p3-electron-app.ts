@@ -17,6 +17,7 @@ import { SET_TRAIL } from '../reducers/RedNaviComp';
 
 class P3ElectronApp extends Component {
   _reducer: RedP3ElectronApp;
+  reduxListenerUnsubsribe: Function;
 
 
 
@@ -25,7 +26,7 @@ class P3ElectronApp extends Component {
 
     this._reducer = new RedP3ElectronApp();
     reduxStoreInstance.registerReducer(this._reducer);
-    reduxStoreInstance.subscribe(() => this.reduxtrigger(reduxStoreInstance));
+    this.reduxListenerUnsubsribe = reduxStoreInstance.subscribe(() => this.reduxtrigger(reduxStoreInstance));
 
     document.addEventListener("keydown", (event: KeyboardEvent) => {
       let element = event.currentTarget as HTMLScriptElement;
@@ -137,6 +138,11 @@ class P3ElectronApp extends Component {
     `;
   }
   reduxtrigger(storeInstance) {
+
+    if (!this.isConnected) {
+      this.reduxListenerUnsubsribe();
+      return;
+    }
 
     var state: State = storeInstance.getState();
 

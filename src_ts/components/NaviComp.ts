@@ -11,6 +11,7 @@ import { FileTree } from '../lib/FileTree';
 
 class NaviComp extends Component {
     _reducer: any;
+    reduxListenerUnsubsribe: Function;
 
 
     constructor() {
@@ -20,7 +21,7 @@ class NaviComp extends Component {
 
         this._reducer = new RedNaviComp();
         reduxStoreInstance.registerReducer(this._reducer);
-        reduxStoreInstance.subscribe(() => this.reduxtrigger(reduxStoreInstance));
+        this.reduxListenerUnsubsribe = reduxStoreInstance.subscribe(() => this.reduxtrigger(reduxStoreInstance));
 
     }
 
@@ -107,6 +108,11 @@ class NaviComp extends Component {
     }
 
     reduxtrigger(storeInstance) {
+
+        if (!this.isConnected) {
+            this.reduxListenerUnsubsribe();
+            return;
+        }
 
         var state: State = storeInstance.getState();
 

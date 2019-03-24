@@ -9,6 +9,8 @@ import { reduxStoreInstance, State } from '../ReduxStore';
 
 class ButtonBarComp extends Component {
     _reducer: any;
+    reduxListener: void;
+    reduxListenerUnsubsribe: Function;
 
 
     constructor() {
@@ -16,7 +18,7 @@ class ButtonBarComp extends Component {
 
         this._reducer = new RedButtonBarComp();
         reduxStoreInstance.registerReducer(this._reducer);
-        reduxStoreInstance.subscribe(() => this.reduxtrigger(reduxStoreInstance));
+        this.reduxListenerUnsubsribe = reduxStoreInstance.subscribe(() => this.reduxtrigger(reduxStoreInstance));
 
     }
 
@@ -125,6 +127,10 @@ class ButtonBarComp extends Component {
     }
 
     reduxtrigger(storeInstance) {
+
+        if (!this.isConnected) {
+            this.reduxListenerUnsubsribe();
+        }
 
         var state: State = storeInstance.getState();
 

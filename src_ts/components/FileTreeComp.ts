@@ -8,6 +8,7 @@ import { SET_TRAIL } from '../reducers/RedNaviComp';
 import { TAB_PRESSED } from '../reducers/RedP3ElectronApp'
 import '../lib/components/ContextMenu';
 import { ContextEventResult } from '../lib/components/ContextMenu';
+import { Util } from '../lib/Util';
 
 
 
@@ -29,6 +30,7 @@ const RESOURCEURLS = 'ResourceURLs';
 
 class FileTreeComp extends Component {
     _reducer: RedFileTree;
+    reduxListenerUnsubsribe: Function;
 
 
     constructor() {
@@ -37,7 +39,7 @@ class FileTreeComp extends Component {
 
         this._reducer = new RedFileTree();
         reduxStoreInstance.registerReducer(this._reducer);
-        reduxStoreInstance.subscribe(() => this.reduxtrigger(reduxStoreInstance));
+        this.reduxListenerUnsubsribe = reduxStoreInstance.subscribe(() => this.reduxtrigger(reduxStoreInstance));
 
 
     }
@@ -77,7 +79,11 @@ class FileTreeComp extends Component {
 
             if (directory.classList.contains("focused")) {
                 directory.focus({ preventScroll: true });
-                directory.scrollIntoView(false);
+
+                if (!Util.isScrolledIntoView(directory, this)) {
+                    directory.scrollIntoView(false);
+                }
+
                 directory.addEventListener("keydown", (ev) => {
                     this._reducer.boundActionKeyPressed(ev.keyCode, this.id);
                 })
@@ -104,7 +110,13 @@ class FileTreeComp extends Component {
 
             if (file.classList.contains("focused")) {
                 file.focus({ preventScroll: true });
-                file.scrollIntoView(false);
+
+                var rect = file.parentElement.getBoundingClientRect();
+                if (!Util.isScrolledIntoView(file, this)) {
+                    file.scrollIntoView(false);
+                }
+
+
                 file.addEventListener("keydown", (ev) => {
                     this._reducer.boundActionKeyPressed(ev.keyCode, this.id);
                 })
@@ -355,8 +367,9 @@ class FileTreeComp extends Component {
 
 
 
-        html = html.concat(Component.html`<li contenteditable="false"><span class="${classes}" draggable="true" kPath="${dir.getPath()}" id="${this.creationPathToId(dir.getPath())}"
-        contenteditable="true">${dir.getName()}</span>`);
+        html = html.concat(Component.html`<li contenteditable="false">
+    <div class="${classes}" draggable="true" kPath="${dir.getPath()}" id="${this.creationPathToId(dir.getPath())}"
+        contenteditable="true">${dir.getName()}</div>`);
         html = html.concat(Component.html`
             <context-menu id="${" context" + dir.getPath()}" class="dirMenu" elementId="${this.creationPathToId(dir.getPath())}"
                 menu-entries=${JSON.stringify(menuEntries)} type=contextmenu ident="${dir.getPath()}">
@@ -380,8 +393,10 @@ class FileTreeComp extends Component {
                 classes = "file";
             }
 
-            html = html.concat(Component.html`<li contenteditable="false"><span class="${classes}" draggable="true" kPath="${file.getPath()}" id="${this.creationPathToId(file.getPath())}"
-        contenteditable="true">${file.getName()}</span></li>`);
+            html = html.concat(Component.html`<li contenteditable="false">
+    <div class="${classes}" draggable="true" kPath="${file.getPath()}" id="${this.creationPathToId(file.getPath())}"
+        contenteditable="true">${file.getName()}</div>
+</li>`);
         });
 
 
@@ -397,6 +412,11 @@ class FileTreeComp extends Component {
     }
 
     reduxtrigger(storeInstance) {
+
+        if (!this.isConnected) {
+            this.reduxListenerUnsubsribe();
+            return;
+        }
 
         var state: State = storeInstance.getState();
 
