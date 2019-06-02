@@ -2,14 +2,12 @@
 
 import { Component } from '../lib/Component';
 import { CSS } from '../Css';
-import './FileTreeComp';
-import "./NaviComp";
 import "./ButtonBarComp";
+import "./NaviWindowComp";
 
 import { reduxStoreInstance, State } from '../ReduxStore';
 import { RedP3ElectronApp, TAB_PRESSED } from '../reducers/RedP3ElectronApp';
-import { ELEMENT_CLICKED } from '../reducers/RedFileTree';
-import { SET_TRAIL } from '../reducers/RedNaviComp';
+
 
 
 
@@ -76,13 +74,13 @@ class P3ElectronApp extends Component {
             }
             .leftWindow { 
                 grid-area: left; 
-                overflow: auto;
+                /*overflow: auto;*/
                 height: 70vh;
                 
                 }
             .rightWindow { 
                 grid-area: right; 
-                overflow: auto;
+                /*overflow: auto;*/
                 height: 70vh;
                 }
             .terminalarea{
@@ -121,13 +119,11 @@ class P3ElectronApp extends Component {
             </div>
              
             <div class="leftWindow" id="leftDirTree">
-               <navi-view id="leftDirTree"></navi-view>
-               <file-tree id="leftDirTree"></file-tree>
+               <navi-window_comp id="leftDirTree"></navi-window_comp>
             </div>
 
             <div class="rightWindow" id="rightDirTree" >
-               <navi-view id="rightDirTree"></navi-view>
-               <file-tree id="rightDirTree"></file-tree>
+               <navi-window_comp id="rightDirTree"></navi-window_comp>
             </div>
             
             <div class="terminalarea">
@@ -147,9 +143,7 @@ class P3ElectronApp extends Component {
     var state: State = storeInstance.getState();
 
     switch (state.action) {
-      case ELEMENT_CLICKED:
       case TAB_PRESSED:
-      case SET_TRAIL:
         this.update();
         break;
       default:

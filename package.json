@@ -10,7 +10,9 @@
     "font-awesome": "^4.7.0",
     "mousetrap": "^1.6.2",
     "redux": "^4.0.1",
-    "redux-thunk": "^2.3.0"
+    "redux-thunk": "^2.3.0",
+    "simple-git": "^1.113.0",
+    "simplegit": "^1.0.2"
   },
   "devDependencies": {
     "electron": "^4.0.0",

@@ -1,19 +1,29 @@
 
 import { FileTree } from './lib/FileTree';
-import { ButtonBarData, ButtonData, AppButtonData } from './reducers/RedButtonBarComp';
+import { ButtonBarData, ButtonData, AppButtonData, DRAG_AND_DROP, START_WITH_RIGHT_LEFT_SELECTED } from './reducers/RedButtonBarComp';
 import { AbstractReduxStore } from './lib/AbstractReduxStore';
 
 const LEFTDIRTREE = 'leftDirTree';
 const RIGHTDIRTREE = 'rightDirTree';
 
 
+
 const configButtonBar = {
     buttons: [
         {
+            mode: 'DRAG_AND_DROP_MODE',
             cwd: "/Applications/CotEditor.app/Contents/SharedSupport/bin",
             command: "/Applications/CotEditor.app/Contents/SharedSupport/bin/cot",
             icon: "",
             title: "cot"
+
+        } as AppButtonData,
+        {
+            mode: 'START_WITH_RIGHT_LEFT_SELECTED',
+            cwd: "/Applications/SmartSynchronize.app/Contents/MacOS",
+            command: "/Applications/SmartSynchronize.app/Contents/MacOS/SmartSynchronize",
+            icon: "",
+            title: "smartsynch"
 
         } as AppButtonData,
     ]
