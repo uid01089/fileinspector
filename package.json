@@ -15,7 +15,7 @@
     "simplegit": "^1.0.2"
   },
   "devDependencies": {
-    "electron": "^4.0.0",
+    "electron": "^9.1.0",
     "typescript-tslint-plugin": "^0.3.1"
   }
 }
